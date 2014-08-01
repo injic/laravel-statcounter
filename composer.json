@@ -1,0 +1,23 @@
+{
+    "name": "injic/laravel-statcounter",
+    "description": "",
+    "authors": [
+        {
+            "name": "James M Irvine",
+            "email": "james@jamesmirvine.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
+        "psr-0": {
+            "Injic\\LaravelStatcounter\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

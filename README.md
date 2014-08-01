@@ -1,4 +1,8 @@
-laravel-statcounter
-===================
+StatCounter API with support for Laravel 
+---
 
-A composer package for the StatCounter API which supports the Laravel 4 framework.
+The package supports use with the [Laravel framework][2] (v4) providing a 'Stat' facade.
+
+----
+
+Currently under development...
