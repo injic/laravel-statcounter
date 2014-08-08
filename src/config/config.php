@@ -23,7 +23,7 @@ return array(
      |--------------------------------------------------------------------------
      |
      | Here you will need to provide the API password for StatCounter. This is
-     | not the same as your login password. You may set one here:
+     | NOT the same as your login password. You may set one here:
      | 
      |   http://api.statcounter.com/password
      |
@@ -74,12 +74,20 @@ return array(
      | StatCounter Project Security Code
      |--------------------------------------------------------------------------
      |
+     | The security codes array should match the projects array, or at least
+     | contain the project name/security code pair for the projects your wish
+     | to display trackers for.
+     | 
      | The security code is used in the tracker by StatCounter to validate your
      | tracker's page hits. You can find it in your project's config section 
      | under 'Security Code'.
      |
      */
     
-    'security-code' => 'your-project-security-code-here',
+    'security-codes' => [
+    
+        'your-project-name' => 'your-project-security-code-here'
+    
+    ],
     
 );
