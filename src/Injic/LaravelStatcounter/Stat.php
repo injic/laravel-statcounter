@@ -128,14 +128,14 @@ class Stat {
    *
    * @var string
    */
-  protected $func = null;
+  protected $func;
 
   /**
    * The parameters to be passed to the selected API function.
    *
    * @var array(string)
    */
-  protected $params = [ ];
+  protected $params;
 
 	/**
 	 * The maximum number of records to return.
@@ -194,7 +194,7 @@ class Stat {
    */
   protected function initStats($type) {
     $this->func = 'stats/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
     $this->params['s'] = $type;
   }
   
@@ -519,7 +519,7 @@ class Stat {
   public function addProject($websiteTitle, $websiteUrl, $timezone, $publicStats = self::PUBLIC_STATS_NONE)
   {
     $this->func = 'add_project/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
     
     $this->params['wt'] = $websiteTitle;
     $this->params['wu'] = $websiteUrl;
@@ -542,7 +542,7 @@ class Stat {
   public function updateProject($websiteTitle = null, $publicStats = self::PUBLIC_STATS_NONE)
   {
     $this->func = 'update_project/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
     
     if (!is_null($websiteTitle))
     {
@@ -565,7 +565,7 @@ class Stat {
   public function updateLogsize($websiteTitle = null)
   {
     $this->func = 'update_logsize/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
   
     if (!is_null($websiteTitle))
     {
@@ -583,7 +583,7 @@ class Stat {
   public function accountLogsizes()
   {
     $this->func = 'account_logsizes/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
   
     return $this->get();
   }
@@ -598,7 +598,7 @@ class Stat {
   public function userDetails($username = null, $password = null)
   {
     $this->func = 'user_details/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
     
     if (!is_null($username))
     {
@@ -633,7 +633,7 @@ class Stat {
   public function userProjects($username = null, $password = null)
   {
     $this->func = 'user_projects/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
     
     if (!is_null($username))
     {
@@ -667,7 +667,7 @@ class Stat {
   public function selectProject($websiteTitle = null)
   {
     $this->func = 'select_project/';
-    $this->params = self::$API_DEFAULT_PARAMS;
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
   
     if (!is_null($websiteTitle))
     {
@@ -759,6 +759,19 @@ class Stat {
   }
 
   /**
+   * Execute the query and get the first result.
+   *
+   * @param  array   $columns
+   * @return mixed|static
+   */
+  public function first($params = null)
+  {
+    $results = $this->take(1)->get($params);
+  
+    return count($results) > 0 ? reset($results) : null;
+  }
+  
+  /**
    * Execute the query as a "select" statement.
    *
    * @param array $params
@@ -776,6 +789,8 @@ class Stat {
     {
       $data = $this->getFresh( $params );
     }
+    
+    $this->params = null;
     
     return array_slice($data, $this->offset, $this->limit, true);
   }
@@ -949,6 +964,8 @@ class Stat {
    */
   public function setRange($granularity, $start, $end)
   {
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
+    
     if ( !($start instanceof Carbon) )
     {
       if (is_numeric($start))
@@ -1033,21 +1050,23 @@ class Stat {
    */
   public function project($websiteTitle)
   {
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
+    
     $projects = \Config::get('laravel-statcounter::projects');
     if ($this->params['pi'] === null)
     {
-      $this->params['pi'] = $projects[$name];
+      $this->params['pi'] = $projects[$websiteTitle];
     }
     else if (is_string($this->params['pi']))
     {
       $tmp = $this->params['pi'];
       $this->params['pi'] = [];
       $this->params['pi'][] = $tmp;
-      $this->params['pi'][] = $projects[$name];
+      $this->params['pi'][] = $projects[$websiteTitle];
     }
     else if (is_array($this->params['pi']))
     {
-      $this->params['pi'][] = $projects[$name];
+      $this->params['pi'][] = $projects[$websiteTitle];
     }
     
     return $this;
