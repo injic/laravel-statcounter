@@ -11,7 +11,7 @@ In order to install, add the following to your `composer.json` file within the `
 ```js
 "require": {
     …
-    "injic/laravel-statcounter": "1.1",
+    "injic/laravel-statcounter": "1.*",
     …
 }
 ```
