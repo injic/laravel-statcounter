@@ -34,7 +34,6 @@ class LaravelStatcounterServiceProvider extends ServiceProvider {
     
     $this->app->booting( function () {
       $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-      $loader->alias( 'Stat', 'Injic\LaravelStatcounter\Facades\Stat' );
     } );
   }
 
