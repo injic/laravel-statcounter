@@ -188,6 +188,48 @@ class Stat {
   }
   
   /**
+   * Displays the StatCounter tracker for the project.
+   * 
+   * @param string $isHttps
+   * @param string $isVisible
+   * @param string $websiteTitle
+   * @return string
+   */
+  public function tracker($isHttps = false, $isVisible = false, $websiteTitle = null) {
+    $pid = '';
+    $security = '';
+    if (is_null($websiteTitle)) 
+    {
+      $pid = \Config::get( 'laravel-statcounter::projects.' .
+          \Config::get( 'laravel-statcounter::default' ) );
+      $security = \Config::get( 'laravel-statcounter::security-codes.' .
+          \Config::get( 'laravel-statcounter::default' ) );
+    }
+    else if (is_string($websiteTitle))
+    {
+      $pid = \Config::get( 'laravel-statcounter::projects.' . $websiteTitle);
+      $security = \Config::get( 'laravel-statcounter::security-codes.' . $websiteTitle);
+    }
+    
+    return '<script type="text/javascript">
+var sc_project=' . $pid . '; 
+var sc_invisible=' . ( $isVisible ? '0' : '1' ) . '; 
+var sc_security="' . $security . '"; 
+var sc_https=' . ( $isHttps ? '0' : '1' ) . '; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type=\'text/javascript\' src=\'" +
+scJsHost+
+"statcounter.com/counter/counter.js\'></"+"script>");
+</script>
+<noscript><div class="statcounter"><a title="hits counter"
+href="http://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="http://c.statcounter.com/' . $pid . '/0/' . $security . '/' . ( $isVisible ? '0' : '1' ) . '/"
+alt="hits counter"></a></div></noscript>';
+  }
+  
+  /**
    * Initializes a 'Stats' query.
    * 
    * @param unknown $type
