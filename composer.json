@@ -1,6 +1,10 @@
 {
     "name": "injic/laravel-statcounter",
-    "description": "",
+    "type": "library",
+    "description": "Laravel integration of the StatCounter API",
+    "keywords": ["statcounter","laravel"],
+    "homepage": "https://github.com/injic/laravel-statcounter",
+    "license": "MIT",
     "authors": [
         {
             "name": "James M Irvine",
