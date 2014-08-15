@@ -144,12 +144,12 @@ class Stat {
    */
   public $params;
 
-	/**
-	 * The columns that should be returned.
-	 *
-	 * @var array
-	 */
-	public $columns;
+  /**
+   * The columns that should be returned.
+   *
+   * @var array
+   */
+  public $columns;
 
   /**
    * The maximum number of records to return.
@@ -873,19 +873,19 @@ alt="hits counter"></a></div></noscript>';
     return $this;
   }
 
-	/**
-	 * Pluck a single column's value from the first result of a query.
-	 *
-	 * @param  string  $column
-	 * @return mixed
-	 */
-	public function pluck($column)
-	{
-	  
-		$result = (array) $this->first(array($column));
+  /**
+   * Pluck a single column's value from the first result of a query.
+   *
+   * @param  string  $column
+   * @return mixed
+   */
+  public function pluck($column)
+  {
+    
+    $result = (array) $this->first(array($column));
 
-		return count($result) > 0 ? reset($result) : null;
-	}
+    return count($result) > 0 ? reset($result) : null;
+  }
 
   /**
    * Execute the query and get the first result.
@@ -1323,171 +1323,171 @@ alt="hits counter"></a></div></noscript>';
     }
   }
 
-	/**
-	 * Create a paginator for an un-grouped pagination statement.
-	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
-	{
-		$total = $this->getPaginationCount();
+  /**
+   * Create a paginator for an un-grouped pagination statement.
+   *
+   * @param  \Illuminate\Pagination\Factory  $paginator
+   * @param  int    $perPage
+   * @param  array  $columns
+   * @return \Illuminate\Pagination\Paginator
+   */
+  protected function ungroupedPaginate($paginator, $perPage, $columns)
+  {
+    $total = $this->getPaginationCount();
 
-		// Once we have the total number of records to be paginated, we can grab the
-		// current page and the result array. Then we are ready to create a brand
-		// new Paginator instances for the results which will create the links.
-		$page = $paginator->getCurrentPage($total);
+    // Once we have the total number of records to be paginated, we can grab the
+    // current page and the result array. Then we are ready to create a brand
+    // new Paginator instances for the results which will create the links.
+    $page = $paginator->getCurrentPage($total);
 
-		$results = $this->forPage($page, $perPage)->get($columns);
+    $results = $this->forPage($page, $perPage)->get($columns);
 
-		return $paginator->make($results, $total, $perPage);
-	}
+    return $paginator->make($results, $total, $perPage);
+  }
 
-	/**
-	 * Get the count of the total records for pagination.
-	 *
-	 * @return int
-	 */
-	public function getPaginationCount()
-	{
-		$this->backupFieldsForCount();
+  /**
+   * Get the count of the total records for pagination.
+   *
+   * @return int
+   */
+  public function getPaginationCount()
+  {
+    $this->backupFieldsForCount();
 
-		// Does a total count, without limit or offset
-		$total = $this->count();
+    // Does a total count, without limit or offset
+    $total = $this->count();
 
-		$this->restoreFieldsForCount();
+    $this->restoreFieldsForCount();
 
-		return $total;
-	}
+    return $total;
+  }
 
-	/**
-	 * Get a paginator only supporting simple next and previous links.
-	 *
-	 * This is more efficient on larger data-sets, etc.
-	 *
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	public function simplePaginate($perPage = 15, $columns = array('*'))
-	{
-		$paginator = \App::make('paginator');
+  /**
+   * Get a paginator only supporting simple next and previous links.
+   *
+   * This is more efficient on larger data-sets, etc.
+   *
+   * @param  int    $perPage
+   * @param  array  $columns
+   * @return \Illuminate\Pagination\Paginator
+   */
+  public function simplePaginate($perPage = 15, $columns = array('*'))
+  {
+    $paginator = \App::make('paginator');
 
-		$page = $paginator->getCurrentPage();
+    $page = $paginator->getCurrentPage();
 
-		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
+    $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-		return $paginator->make($this->get($columns), $perPage);
-	}
+    return $paginator->make($this->get($columns), $perPage);
+  }
 
-	/**
-	 * Backup certain fields for a pagination count.
-	 *
-	 * @return void
-	 */
-	protected function backupFieldsForCount()
-	{
-		foreach (array('params', 'limit', 'offset', 'columns', 'url') as $field)
-		{
-			$this->backups[$field] = $this->{$field};
+  /**
+   * Backup certain fields for a pagination count.
+   *
+   * @return void
+   */
+  protected function backupFieldsForCount()
+  {
+    foreach (array('params', 'limit', 'offset', 'columns', 'url') as $field)
+    {
+      $this->backups[$field] = $this->{$field};
 
-			$this->{$field} = null;
-		}
+      $this->{$field} = null;
+    }
 
-		$this->params = $this->backups['params'];
-		$this->columns = array('*');
-		$this->url = $this->backups['url'];
-	}
+    $this->params = $this->backups['params'];
+    $this->columns = array('*');
+    $this->url = $this->backups['url'];
+  }
 
-	/**
-	 * Restore certain fields for a pagination count.
-	 *
-	 * @return void
-	 */
-	protected function restoreFieldsForCount()
-	{
-		foreach (array('params', 'limit', 'offset', 'columns', 'url') as $field)
-		{
-			$this->{$field} = $this->backups[$field];
-		}
+  /**
+   * Restore certain fields for a pagination count.
+   *
+   * @return void
+   */
+  protected function restoreFieldsForCount()
+  {
+    foreach (array('params', 'limit', 'offset', 'columns', 'url') as $field)
+    {
+      $this->{$field} = $this->backups[$field];
+    }
 
-		$this->backups = array();
-	}
+    $this->backups = array();
+  }
 
-	/**
-	 * Determine if any rows exist for the current query.
-	 *
-	 * @return bool
-	 */
-	public function exists()
-	{
-		return $this->count() > 0;
-	}
+  /**
+   * Determine if any rows exist for the current query.
+   *
+   * @return bool
+   */
+  public function exists()
+  {
+    return $this->count() > 0;
+  }
 
-	/**
-	 * Retrieve the "count" result of the query.
-	 *
-	 * @param  string  $columns
-	 * @return int
-	 */
-	public function count($columns = array('*'))
-	{
-		$result = count( $this->get($columns) );
+  /**
+   * Retrieve the "count" result of the query.
+   *
+   * @param  string  $columns
+   * @return int
+   */
+  public function count($columns = array('*'))
+  {
+    $result = count( $this->get($columns) );
 
-		return $result;
-	}
+    return $result;
+  }
 
-	/**
-	 * Get a new instance of the stat query.
-	 *
-	 * @return \Injic\LaravelStatcounter
-	 */
-	public function newQuery()
-	{
-	  return new Stat();
-	}
-	
-	/**
-	 * Create a raw query to the API.
-	 *
-	 * @param  mixed  $value
-	 * @return \Injic\LaravelStatcounter|static
-	 */
-	public function raw($value)
-	{
-	  if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
-	  
-	  if ( is_string($value) )
-	  {
-	    $params = [];
-	    
-	    $url = parse_url($value);
-	    if (array_key_exists('query',$url))
-	    {
-	      parse_str($url['query'], $params);
-	    }
-	    else
-	    {
-	      parse_str($test, $params);
-	    }
-	    
-	    // If fully qualify URL with SHA-1 is passed, use it
-	    if (array_key_exists('scheme',$url)
-  	    && array_key_exists('host',$url)
-  	    && array_key_exists('query',$url)
-  	    && array_key_exists('sha1',$params))
-	    {
-	      $this->url = $value;
-	      return $this;
-	    }
-	    
-	    // Otherwise, remove SHA-1 and use params
-	    if (array_key_exists('sha1',$params)) unset($params['sha1']);
-	    
-	    $this->params = array_merge($this->params, $params);
-	    
+  /**
+   * Get a new instance of the stat query.
+   *
+   * @return \Injic\LaravelStatcounter
+   */
+  public function newQuery()
+  {
+    return new Stat();
+  }
+  
+  /**
+   * Create a raw query to the API.
+   *
+   * @param  mixed  $value
+   * @return \Injic\LaravelStatcounter|static
+   */
+  public function raw($value)
+  {
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
+    
+    if ( is_string($value) )
+    {
+      $params = [];
+      
+      $url = parse_url($value);
+      if (array_key_exists('query',$url))
+      {
+        parse_str($url['query'], $params);
+      }
+      else
+      {
+        parse_str($test, $params);
+      }
+      
+      // If fully qualify URL with SHA-1 is passed, use it
+      if (array_key_exists('scheme',$url)
+        && array_key_exists('host',$url)
+        && array_key_exists('query',$url)
+        && array_key_exists('sha1',$params))
+      {
+        $this->url = $value;
+        return $this;
+      }
+      
+      // Otherwise, remove SHA-1 and use params
+      if (array_key_exists('sha1',$params)) unset($params['sha1']);
+      
+      $this->params = array_merge($this->params, $params);
+      
       if (array_key_exists('path',$url))
       {
         $this->func = ( $url['path'][0]=='/' ? substr($url['path'],1) : $url['path'] );
@@ -1496,84 +1496,84 @@ alt="hits counter"></a></div></noscript>';
       {
         $this->func = 'stats/';
       }
-	  }
-	  else if ( is_array($value) )
-	  {
-	    $this->params = array_merge($this->params, $value);
-	  }
-	  else
-	  {
-		  throw new StatException('Invalid raw value submitted');
-	  }
-	   
-	  return $this;
-	}
+    }
+    else if ( is_array($value) )
+    {
+      $this->params = array_merge($this->params, $value);
+    }
+    else
+    {
+      throw new StatException('Invalid raw value submitted');
+    }
+     
+    return $this;
+  }
 
-	/**
-	 * Trims result array by specified columns.
-	 * 
-	 * @param mixed $array
-	 * @return array
-	 */
-	protected function trimColumns($array)
-	{
-	  if (array_search('*',$this->columns)!==false) return $array;
-	  
-	  foreach($array as &$subarray)
-	  {
-	    foreach($subarray as $key => $value)
-	    {
-	      if (array_search($key,$this->columns)===false)
-	      {
-	        unset($subarray->{$key});
-	      }
-	    }
-	  }
-	  
-	  return $array;
-	}
-	
-	/**
-	 * Reads query results for columns.
-	 * 
-	 * @return array
-	 */
-	public function columns()
-	{
-	  $columns = [];
-	  
-	  $array = $this->get();
-	   
-	  foreach($array as $element)
-	  {
-	    foreach($element as $key => $value)
-	    {
-	      if (array_search($key,$columns)===false) $columns[] = $key;
-	    }
-	  }
-	   
-	  return $columns;
-	}
-	
-	/**
-	 * Reads array for column values.
-	 * 
-	 * @param array $array
-	 * @return array
-	 */
-	public static function getColumns($array)
-	{
-	  $columns = [];
-	  
-	  foreach($array as $element)
-	  {
-	    foreach($element as $key => $value)
-	    {
-	      if (array_search($key,$columns)===false) $columns[] = $key;
-	    }
-	  }
-	  
-	  return $columns;
-	}
-	
+  /**
+   * Trims result array by specified columns.
+   * 
+   * @param mixed $array
+   * @return array
+   */
+  protected function trimColumns($array)
+  {
+    if (array_search('*',$this->columns)!==false) return $array;
+    
+    foreach($array as &$subarray)
+    {
+      foreach($subarray as $key => $value)
+      {
+        if (array_search($key,$this->columns)===false)
+        {
+          unset($subarray->{$key});
+        }
+      }
+    }
+    
+    return $array;
+  }
+  
+  /**
+   * Reads query results for columns.
+   * 
+   * @return array
+   */
+  public function columns()
+  {
+    $columns = [];
+    
+    $array = $this->get();
+     
+    foreach($array as $element)
+    {
+      foreach($element as $key => $value)
+      {
+        if (array_search($key,$columns)===false) $columns[] = $key;
+      }
+    }
+     
+    return $columns;
+  }
+  
+  /**
+   * Reads array for column values.
+   * 
+   * @param array $array
+   * @return array
+   */
+  public static function getColumns($array)
+  {
+    $columns = [];
+    
+    foreach($array as $element)
+    {
+      foreach($element as $key => $value)
+      {
+        if (array_search($key,$columns)===false) $columns[] = $key;
+      }
+    }
+    
+    return $columns;
+  }
+  
 }
