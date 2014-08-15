@@ -91,7 +91,7 @@ class Stat {
       't'   => null, // Time of Execution
       'tz'  => null, // Time Zone
       'ps'  => null, // Public Stats
-      'n'   => null, // Number of Results
+      'n'   => 1000, // Number of Results
       'c'   => null, // Chop URL
       'ct'  => null, // Count Type
       'g'   => null, // Granularity
@@ -122,35 +122,56 @@ class Stat {
    * @var array
    */
   protected $projects;
+  
+  /**
+   * The API query URL.
+   * 
+   * @var string
+   */
+  protected $url;
 
   /**
    * The selected function to be called (stats, select_project, etc).
    *
    * @var string
    */
-  protected $func;
+  public $func;
 
   /**
    * The parameters to be passed to the selected API function.
    *
    * @var array(string)
    */
-  protected $params;
+  public $params;
 
 	/**
-	 * The maximum number of records to return.
+	 * The columns that should be returned.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	public $limit = null;
+	public $columns;
 
-	/**
-	 * The number of records to skip.
-	 *
-	 * @var int
-	 */
-	public $offset = 0;
+  /**
+   * The maximum number of records to return.
+   *
+   * @var int
+   */
+  public $limit = null;
 
+  /**
+   * The number of records to skip.
+   *
+   * @var int
+   */
+  public $offset = 0;
+
+  /**
+   * The backups of fields while doing a pagination count.
+   *
+   * @var array
+   */
+  protected $backups = array();
+  
   /**
    * The key that should be used when caching the query.
    *
@@ -243,7 +264,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start a 'recent visitor' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function recentVisitors()
   {
@@ -257,7 +278,7 @@ alt="hits counter"></a></div></noscript>';
    * 
    * @param boolean $chopUrl
    * @param string $countType
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function popularPages($chopUrl = true, $countType = null)
   {
@@ -273,7 +294,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start an 'entry pages' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function entryPages()
   {
@@ -285,7 +306,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start an 'exit pages' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function exitPages()
   {
@@ -300,7 +321,7 @@ alt="hits counter"></a></div></noscript>';
    * @param boolean $external
    * @param boolean $excludeSearchEngines
    * @param boolean $groupByDomain
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function cameFrom($external = true, $excludeSearchEngines = false, $groupByDomain = false)
   {
@@ -320,7 +341,7 @@ alt="hits counter"></a></div></noscript>';
    * 
    * @param boolean $excludeEncryptedKeywords
    * @param boolean $external
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function recentKeywords($excludeEncryptedKeywords = false, $external = true)
   {
@@ -337,7 +358,7 @@ alt="hits counter"></a></div></noscript>';
    * Start a 'browsers' query.
    * 
    * @param integer $device
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function browsers($device = self::DEVICE_ALL)
   {
@@ -346,12 +367,12 @@ alt="hits counter"></a></div></noscript>';
     if ($device != self::DEVICE_ALL) {
       switch ($device)
       {
-      	case self::DEVICE_DESKTOP:
-      	  $this->params['de'] = 'desktop';
-      	  break;
-      	case self::DEVICE_MOBILE:
-      	  $this->params['de'] = 'mobile';
-      	  break;
+        case self::DEVICE_DESKTOP:
+          $this->params['de'] = 'desktop';
+          break;
+        case self::DEVICE_MOBILE:
+          $this->params['de'] = 'mobile';
+          break;
       }
     }
   
@@ -362,7 +383,7 @@ alt="hits counter"></a></div></noscript>';
    * Start an 'operating systems' query.
    *
    * @param integer $device
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function operatingSystems($device = self::DEVICE_ALL)
   {
@@ -371,12 +392,12 @@ alt="hits counter"></a></div></noscript>';
     if ($device != self::DEVICE_ALL) {
       switch ($device)
       {
-      	case self::DEVICE_DESKTOP:
-      	  $this->params['de'] = 'desktop';
-      	  break;
-      	case self::DEVICE_MOBILE:
-      	  $this->params['de'] = 'mobile';
-      	  break;
+        case self::DEVICE_DESKTOP:
+          $this->params['de'] = 'desktop';
+          break;
+        case self::DEVICE_MOBILE:
+          $this->params['de'] = 'mobile';
+          break;
       }
     }
   
@@ -386,7 +407,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start a 'search engines' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function searchEngines()
   {
@@ -398,7 +419,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start a 'country' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function country()
   {
@@ -411,7 +432,7 @@ alt="hits counter"></a></div></noscript>';
    * Start an 'recent pageload activity' query.
    *
    * @param integer $device
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function recentPageload($device = self::DEVICE_ALL)
   {
@@ -420,12 +441,12 @@ alt="hits counter"></a></div></noscript>';
     if ($device != self::DEVICE_ALL) {
       switch ($device)
       {
-      	case self::DEVICE_DESKTOP:
-      	  $this->params['de'] = 'desktop';
-      	  break;
-      	case self::DEVICE_MOBILE:
-      	  $this->params['de'] = 'mobile';
-      	  break;
+        case self::DEVICE_DESKTOP:
+          $this->params['de'] = 'desktop';
+          break;
+        case self::DEVICE_MOBILE:
+          $this->params['de'] = 'mobile';
+          break;
       }
     }
   
@@ -436,7 +457,7 @@ alt="hits counter"></a></div></noscript>';
    * Start an 'exit link activity' query.
    *
    * @param integer $device
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function exitLink($device = self::DEVICE_ALL)
   {
@@ -445,12 +466,12 @@ alt="hits counter"></a></div></noscript>';
     if ($device != self::DEVICE_ALL) {
       switch ($device)
       {
-      	case self::DEVICE_DESKTOP:
-      	  $this->params['de'] = 'desktop';
-      	  break;
-      	case self::DEVICE_MOBILE:
-      	  $this->params['de'] = 'mobile';
-      	  break;
+        case self::DEVICE_DESKTOP:
+          $this->params['de'] = 'desktop';
+          break;
+        case self::DEVICE_MOBILE:
+          $this->params['de'] = 'mobile';
+          break;
       }
     }
   
@@ -461,7 +482,7 @@ alt="hits counter"></a></div></noscript>';
    * Start an 'download link activity' query.
    *
    * @param integer $device
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function downloadLink($device = self::DEVICE_ALL)
   {
@@ -470,12 +491,12 @@ alt="hits counter"></a></div></noscript>';
     if ($device != self::DEVICE_ALL) {
       switch ($device)
       {
-      	case self::DEVICE_DESKTOP:
-      	  $this->params['de'] = 'desktop';
-      	  break;
-      	case self::DEVICE_MOBILE:
-      	  $this->params['de'] = 'mobile';
-      	  break;
+        case self::DEVICE_DESKTOP:
+          $this->params['de'] = 'desktop';
+          break;
+        case self::DEVICE_MOBILE:
+          $this->params['de'] = 'mobile';
+          break;
       }
     }
   
@@ -485,7 +506,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start a 'visit length' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function visitLength()
   {
@@ -497,7 +518,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Start a 'returning visits' query.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function returningVisits()
   {
@@ -511,7 +532,7 @@ alt="hits counter"></a></div></noscript>';
    * 
    * @param integer $combineKeywords
    * @param boolean $excludeEncryptedKeywords
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function keywordAnalysis($combineKeywords = self::SEARCH_ENGINE_HOST, $excludeEncryptedKeywords = false)
   {
@@ -520,12 +541,12 @@ alt="hits counter"></a></div></noscript>';
     if ($combineKeywords != self::SEARCH_ENGINE_HOST) {
       switch ($combineKeywords)
       {
-      	case self::SEARCH_ENGINE_NAME:
-      	  $this->params['ck'] = 'search_engine_name';
-      	  break;
-      	case self::SEARCH_ENGINE_TOGETHER:
-      	  $this->params['ck'] = 'together';
-      	  break;
+        case self::SEARCH_ENGINE_NAME:
+          $this->params['ck'] = 'search_engine_name';
+          break;
+        case self::SEARCH_ENGINE_TOGETHER:
+          $this->params['ck'] = 'together';
+          break;
       }
     }
     
@@ -538,7 +559,7 @@ alt="hits counter"></a></div></noscript>';
    * Start a 'lookup visitor' query.
    * 
    * @param string $ipAddress
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function lookupVisitor($ipAddress)
   {
@@ -588,7 +609,7 @@ alt="hits counter"></a></div></noscript>';
     
     if (!is_null($websiteTitle))
     {
-      $this->projects($websiteTitle);
+      $this->project($websiteTitle);
     }
     
     if ($publicStats != self::PUBLIC_STATS_ALL) {
@@ -611,7 +632,7 @@ alt="hits counter"></a></div></noscript>';
   
     if (!is_null($websiteTitle))
     {
-      $this->projects($websiteTitle);
+      $this->project($websiteTitle);
     }
   
     return $this->get();
@@ -713,10 +734,58 @@ alt="hits counter"></a></div></noscript>';
   
     if (!is_null($websiteTitle))
     {
-      $this->projects($websiteTitle);
+      $this->project($websiteTitle);
     }
     
     return $this->get();
+  }
+  
+  /**
+   * Set the "offset" value of the query.
+   *
+   * @param  int  $value
+   * @return \Injic\LaravelStatcounter\Stat|static
+   */
+  public function offset($value)
+  {
+    $this->offset = max(0, $value);
+
+    return $this;
+  }
+
+  /**
+   * Alias to set the "offset" value of the query.
+   *
+   * @param  int  $value
+   * @return \Injic\LaravelStatcounter\Stat|static
+   */
+  public function skip($value)
+  {
+    return $this->offset($value);
+  }
+
+  /**
+   * Set the "limit" value of the query.
+   *
+   * @param  int  $value
+   * @return \Injic\LaravelStatcounter\Stat|static
+   */
+  public function limit($value)
+  {
+    if ($value > 0) $this->limit = $value;
+
+    return $this;
+  }
+
+  /**
+   * Alias to set the "limit" value of the query.
+   *
+   * @param  int  $value
+   * @return \Injic\LaravelStatcounter\Stat|static
+   */
+  public function take($value)
+  {
+    return $this->limit($value);
   }
   
   /**
@@ -726,14 +795,18 @@ alt="hits counter"></a></div></noscript>';
    */
   public function toUrl($isFull = true)
   {
-    if (is_null($this->params['u']))
+    if (!is_null($this->url)) return $this->url;
+    
+    if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
+    
+    if (!array_key_exists('u', $this->params) || is_null($this->params['u']))
     {
       $this->params['u'] = \Config::get( 'laravel-statcounter::username' );
     }
     
     $this->params['t'] = time();
     
-    if (is_null($this->params['pi']))
+    if (!array_key_exists('pi', $this->params) || is_null($this->params['pi']))
     {
       $this->params['pi'] = \Config::get( 'laravel-statcounter::projects.' . 
           \Config::get( 'laravel-statcounter::default' ) );
@@ -755,7 +828,7 @@ alt="hits counter"></a></div></noscript>';
    * Indicate that the query results should be cached.
    *
    * @param integer $minutes
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function remember($minutes)
   {
@@ -767,7 +840,7 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Indicate that the query results should be cached forever.
    *
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function rememberForever()
   {
@@ -778,7 +851,7 @@ alt="hits counter"></a></div></noscript>';
    * Indicate that the results, if cached, should use the given cache tags.
    *
    * @param array|dynamic $cacheTags          
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function cacheTags($cacheTags)
   {
@@ -791,7 +864,7 @@ alt="hits counter"></a></div></noscript>';
    * Indicate that the results, if cached, should use the given cache driver.
    *
    * @param string $cacheDriver          
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function cacheDriver($cacheDriver)
   {
@@ -800,15 +873,29 @@ alt="hits counter"></a></div></noscript>';
     return $this;
   }
 
+	/**
+	 * Pluck a single column's value from the first result of a query.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function pluck($column)
+	{
+	  
+		$result = (array) $this->first(array($column));
+
+		return count($result) > 0 ? reset($result) : null;
+	}
+
   /**
    * Execute the query and get the first result.
    *
    * @param  array   $columns
    * @return mixed|static
    */
-  public function first($params = null)
+  public function first($columns = array('*'))
   {
-    $results = $this->take(1)->get($params);
+    $results = $this->numberOfResults(1)->get($columns);
   
     return count($results) > 0 ? reset($results) : null;
   }
@@ -816,41 +903,60 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Execute the query as a "select" statement.
    *
-   * @param array $params
+   * @param array $columns
    * @return array
    */
-  public function get($params = null)
+  public function get($columns = array('*'))
   {
     $data = [];
     
     if (! is_null( $this->cacheMinutes ))
     { 
-      $data = $this->getCached( $params );
+      $data = $this->getCached( $columns );
     }
     else 
     {
-      $data = $this->getFresh( $params );
+      $data = $this->getFresh( $columns );
     }
     
     $this->params = null;
+    $this->columns = array('*');
+    $this->url = null;
     
-    return array_slice($data, $this->offset, $this->limit, true);
+    $result = array_slice($data, $this->offset, $this->limit, true);
+    
+    $this->limit = null;
+    $this->offset = 0;
+    
+    return $result;
   }
 
   /**
    * Execute the query as a fresh call to the API.
    *
-   * @param array $params
+   * @param array $columns
    * @return array
    */
-  public function getFresh($params = null)
+  public function getFresh($columns = array('*'))
   {
-    if (is_null($this->params)) $this->params = $params;
-    
+    if (is_null($this->columns)) $this->columns = $columns;
+
+    return $this->runQuery(self::toUrl());
+  }
+  
+  /**
+   * Run the query against the API.
+   * 
+   * @param string $url
+   * @throws StatException 
+   * @return array
+   */
+  protected function runQuery($url)
+  {
     $ch = curl_init();
     
     $optArray = array (
-        CURLOPT_URL            => self::toUrl(),
+        CURLOPT_URL            => $url,
         CURLOPT_RETURNTRANSFER => true,  // return content
         CURLOPT_HEADER         => false, // don't return headers
         CURLOPT_FOLLOWLOCATION => true,  // follow redirects
@@ -861,18 +967,19 @@ alt="hits counter"></a></div></noscript>';
     );
     curl_setopt_array( $ch, $optArray );
     
+    // send query and store response
     $response = curl_exec( $ch );
     
     if ($response === false)
     {
       throw new StatException( 'Error connecting to API: ' . curl_error( $ch ) );
     }
-    
+
     $result = json_decode( $response );
     
     if ($result === null)
     {
-      throw new StatException( "Error decoding API response: \n" . $response );
+      throw new StatException( "Error decoding API response: " . $response );
     }
     
     if ($result->{"@attributes"}->status === 'fail' || $result->{"@attributes"}->status != 'ok')
@@ -882,20 +989,22 @@ alt="hits counter"></a></div></noscript>';
       {
         $messages .= $error->description . "\n";
       }
-      throw new StatException( "Error response from API: \n" . $messages );
+      throw new StatException( "StatCounter API Error: " . $messages );
     }
     
-    $data = null;
+    $data = [];
+    // Handle multiple projects if necessary
     if (is_array($this->params['pi']))
     {
       foreach($result->project as $project)
       {
-      	$data[$this->projects[$project->id]] = $project->sc_data;
+        if (!property_exists($project,'id') || !property_exists($project,'sc_data')) continue;
+        $data[$this->projects[$project->id]] = $this->trimColumns($project->sc_data);
       }
     }
     else if (property_exists($result,'sc_data'))
     {
-      $data = $result->sc_data;
+      $data = $this->trimColumns($result->sc_data);
     }
     
     return $data;
@@ -904,13 +1013,13 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Execute the query as a cached call to the API.
    *
-   * @param array $params
+   * @param array $columns
    * @return array
    */
-  public function getCached($params = null)
+  public function getCached($columns = array('*'))
   {
-    if (is_null($this->params)) $this->params = $params;
-    
+    if (is_null($this->columns)) $this->columns = $columns;
+        
     // If the query is requested to be cached, we will cache it using a unique key
     // for this database connection and query statement, including the bindings
     // that are used on this query, providing great convenience when caching.
@@ -981,14 +1090,14 @@ alt="hits counter"></a></div></noscript>';
   /**
    * Get the Closure callback used when caching queries.
    *
-   * @param array $params          
+   * @param array $columns          
    * @return \Closure
    */
-  protected function getCacheCallback($params)
+  protected function getCacheCallback($columns)
   {
-    return function () use($params)
+    return function () use($columns)
     {
-      return $this->getFresh( $params );
+      return $this->getFresh( $columns );
     };
   }
   
@@ -1002,7 +1111,7 @@ alt="hits counter"></a></div></noscript>';
    * @param integer               $granularity
    * @param integer|string|Carbon $start
    * @param integer|string|Carbon $end
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function setRange($granularity, $start, $end)
   {
@@ -1033,52 +1142,52 @@ alt="hits counter"></a></div></noscript>';
     
     switch($granularity)
     {
-    	case self::GRAN_HOURLY:
-    	  $this->params['g'] = 'hourly';
-    	  $this->params['sh'] = $start->hour;
-    	  $this->params['sd'] = $start->day;
-    	  $this->params['sm'] = $start->month;
-    	  $this->params['sy'] = $start->year;
-    	  $this->params['eh'] = $end->hour;
-    	  $this->params['ed'] = $end->day;
-    	  $this->params['em'] = $end->month;
-    	  $this->params['ey'] = $end->year;
-    	  break;
-    	case self::GRAN_DAILY:
-    	  $this->params['g'] = 'daily';
-    	  $this->params['sd'] = $start->day;
-    	  $this->params['sm'] = $start->month;
-    	  $this->params['sy'] = $start->year;
-    	  $this->params['ed'] = $end->day;
-    	  $this->params['em'] = $end->month;
-    	  $this->params['ey'] = $end->year;
-    	  break;
-    	case self::GRAN_WEEKLY:
-    	  $this->params['g'] = 'weekly';
-    	  $this->params['sw'] = $start->weekOfYear;
-    	  $this->params['sy'] = $start->year;
-    	  $this->params['ew'] = $end->weekOfYear;
-    	  $this->params['ey'] = $end->year;
-    	  break;
-    	case self::GRAN_MONTHLY:
-    	  $this->params['g'] = 'monthly';
-    	  $this->params['sm'] = $start->month;
-    	  $this->params['sy'] = $start->year;
-    	  $this->params['em'] = $end->month;
-    	  $this->params['ey'] = $end->year;
-    	  break;
-    	case self::GRAN_QUARTERLY:
-    	  $this->params['g'] = 'quarterly';
-    	  $this->params['sq'] = $start->quarter;
-    	  $this->params['sy'] = $start->year;
-    	  $this->params['eq'] = $end->quarter;
-    	  $this->params['ey'] = $end->year;
-    	  break;
-    	case self::GRAN_YEARLY:
-    	  $this->params['g'] = 'yearly';
-    	  $this->params['sy'] = $start->year;
-    	  $this->params['ey'] = $end->year;
-    	  break;
+      case self::GRAN_HOURLY:
+        $this->params['g'] = 'hourly';
+        $this->params['sh'] = $start->hour;
+        $this->params['sd'] = $start->day;
+        $this->params['sm'] = $start->month;
+        $this->params['sy'] = $start->year;
+        $this->params['eh'] = $end->hour;
+        $this->params['ed'] = $end->day;
+        $this->params['em'] = $end->month;
+        $this->params['ey'] = $end->year;
+        break;
+      case self::GRAN_DAILY:
+        $this->params['g'] = 'daily';
+        $this->params['sd'] = $start->day;
+        $this->params['sm'] = $start->month;
+        $this->params['sy'] = $start->year;
+        $this->params['ed'] = $end->day;
+        $this->params['em'] = $end->month;
+        $this->params['ey'] = $end->year;
+        break;
+      case self::GRAN_WEEKLY:
+        $this->params['g'] = 'weekly';
+        $this->params['sw'] = $start->weekOfYear;
+        $this->params['sy'] = $start->year;
+        $this->params['ew'] = $end->weekOfYear;
+        $this->params['ey'] = $end->year;
+        break;
+      case self::GRAN_MONTHLY:
+        $this->params['g'] = 'monthly';
+        $this->params['sm'] = $start->month;
+        $this->params['sy'] = $start->year;
+        $this->params['em'] = $end->month;
+        $this->params['ey'] = $end->year;
+        break;
+      case self::GRAN_QUARTERLY:
+        $this->params['g'] = 'quarterly';
+        $this->params['sq'] = $start->quarter;
+        $this->params['sy'] = $start->year;
+        $this->params['eq'] = $end->quarter;
+        $this->params['ey'] = $end->year;
+        break;
+      case self::GRAN_YEARLY:
+        $this->params['g'] = 'yearly';
+        $this->params['sy'] = $start->year;
+        $this->params['ey'] = $end->year;
+        break;
     }
     
     return $this;
@@ -1088,7 +1197,7 @@ alt="hits counter"></a></div></noscript>';
    * Sets or adds a project to the query.
    * 
    * @param string $websiteTitle
-   * @return \Injic\LaravelStatcounter\Stat
+   * @return \Injic\LaravelStatcounter\Stat|static
    */
   public function project($websiteTitle)
   {
@@ -1113,73 +1222,358 @@ alt="hits counter"></a></div></noscript>';
     
     return $this;
   }
+
+  /**
+   * Overrides the username for this pageload.
+   *
+   * @param string $username
+   */
+  public function setUsername($username)
+  {
+    \Config::set( 'laravel-statcounter::username', $username);
+  }
   
-	/**
-	 * Set the "offset" value of the query.
-	 *
-	 * @param  int  $value
-   * @return \Injic\LaravelStatcounter\Stat
-	 */
-	public function offset($value)
-	{
-		$this->offset = max(0, $value);
-
-		return $this;
-	}
-
-	/**
-	 * Alias to set the "offset" value of the query.
-	 *
-	 * @param  int  $value
-   * @return \Injic\LaravelStatcounter\Stat
-	 */
-	public function skip($value)
-	{
-		return $this->offset($value);
-	}
-
-	/**
-	 * Set the "limit" value of the query.
-	 *
-	 * @param  int  $value
-   * @return \Injic\LaravelStatcounter\Stat
-	 */
-	public function limit($value)
-	{
-		if ($value > 0) $this->limit = $value;
-
-		return $this;
-	}
-
-	/**
-	 * Alias to set the "limit" value of the query.
-	 *
-	 * @param  int  $value
-   * @return \Injic\LaravelStatcounter\Stat
-	 */
-	public function take($value)
-	{
-		return $this->limit($value);
-	}
+  /**
+   * Overrides the password for this pageload.
+   *
+   * @param string $password
+   */
+  public function setPassword($password)
+  {
+    \Config::set( 'laravel-statcounter::api-password', $password);
+  }
   
+  /**
+   * Set the limit and offset for a given page.
+   *
+   * @param  int  $page
+   * @param  int  $perPage
+   * @return \Injic\LaravelStatcounter\Stat|static
+   */
+  public function forPage($page, $perPage = 15)
+  {
+    return $this->skip(($page - 1) * $perPage)->take($perPage);
+  }
+  
+  /**
+   * Set the number of results to return. Differs from take and limit in that
+   * it sends this straight to the API.
+   * 
+   * @param int $num
+   * @return \Injic\LaravelStatcounter|static
+   */
+  public function numberOfResults($num)
+  {
+    if (is_numeric($num))
+    {
+      $this->params['n'] = $num;
+    }
+    else
+    {
+      throw new StatException('Non-integer given');
+    }
+    
+    return $this;
+  }
+
+  /**
+   * Chunk the results of the query.
+   *
+   * @param  int  $count
+   * @param  callable  $callback
+   * @return void
+   */
+  public function chunk($count, callable $callback)
+  {
+    // Added a short caching of the query to help with chunking performance
+    $results = $this->forPage($page = 1, $count)->remember(1)->get();
+
+    while (count($results) > 0)
+    {
+      // On each chunk result set, we will pass them to the callback and then let the
+      // developer take care of everything within the callback, which allows us to
+      // keep the memory low for spinning through large result sets for working.
+      call_user_func($callback, $results);
+
+      $page++;
+
+      $results = $this->forPage($page, $count)->get();
+    }
+  }
+
+  /**
+   * Get a paginator for the "select" statement.
+   *
+   * @param  int    $perPage
+   * @param  array  $columns
+   * @return \Illuminate\Pagination\Paginator
+   */
+  public function paginate($perPage = 15, $columns = array('*'))
+  {
+    $paginator = \App::make('paginator');
+
+    if (isset($this->groups))
+    {
+      // Grouping not an implemented feature with the current API
+      //return $this->groupedPaginate($paginator, $perPage, $columns);
+    }
+    else
+    {
+      return $this->ungroupedPaginate($paginator, $perPage, $columns);
+    }
+  }
+
 	/**
-	 * Overrides the username for this pageload.
-	 * 
-	 * @param string $username
+	 * Create a paginator for an un-grouped pagination statement.
+	 *
+	 * @param  \Illuminate\Pagination\Factory  $paginator
+	 * @param  int    $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function setUsername($username)
+	protected function ungroupedPaginate($paginator, $perPage, $columns)
 	{
-	  \Config::set( 'laravel-statcounter::username', $username);
+		$total = $this->getPaginationCount();
+
+		// Once we have the total number of records to be paginated, we can grab the
+		// current page and the result array. Then we are ready to create a brand
+		// new Paginator instances for the results which will create the links.
+		$page = $paginator->getCurrentPage($total);
+
+		$results = $this->forPage($page, $perPage)->get($columns);
+
+		return $paginator->make($results, $total, $perPage);
 	}
 
 	/**
-	 * Overrides the password for this pageload.
-	 * 
-	 * @param string $password
+	 * Get the count of the total records for pagination.
+	 *
+	 * @return int
 	 */
-	public function setPassword($password)
+	public function getPaginationCount()
 	{
-	  \Config::set( 'laravel-statcounter::api-password', $password);
+		$this->backupFieldsForCount();
+
+		// Does a total count, without limit or offset
+		$total = $this->count();
+
+		$this->restoreFieldsForCount();
+
+		return $total;
+	}
+
+	/**
+	 * Get a paginator only supporting simple next and previous links.
+	 *
+	 * This is more efficient on larger data-sets, etc.
+	 *
+	 * @param  int    $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	public function simplePaginate($perPage = 15, $columns = array('*'))
+	{
+		$paginator = \App::make('paginator');
+
+		$page = $paginator->getCurrentPage();
+
+		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
+
+		return $paginator->make($this->get($columns), $perPage);
+	}
+
+	/**
+	 * Backup certain fields for a pagination count.
+	 *
+	 * @return void
+	 */
+	protected function backupFieldsForCount()
+	{
+		foreach (array('params', 'limit', 'offset', 'columns', 'url') as $field)
+		{
+			$this->backups[$field] = $this->{$field};
+
+			$this->{$field} = null;
+		}
+
+		$this->params = $this->backups['params'];
+		$this->columns = array('*');
+		$this->url = $this->backups['url'];
+	}
+
+	/**
+	 * Restore certain fields for a pagination count.
+	 *
+	 * @return void
+	 */
+	protected function restoreFieldsForCount()
+	{
+		foreach (array('params', 'limit', 'offset', 'columns', 'url') as $field)
+		{
+			$this->{$field} = $this->backups[$field];
+		}
+
+		$this->backups = array();
+	}
+
+	/**
+	 * Determine if any rows exist for the current query.
+	 *
+	 * @return bool
+	 */
+	public function exists()
+	{
+		return $this->count() > 0;
+	}
+
+	/**
+	 * Retrieve the "count" result of the query.
+	 *
+	 * @param  string  $columns
+	 * @return int
+	 */
+	public function count($columns = array('*'))
+	{
+		$result = count( $this->get($columns) );
+
+		return $result;
+	}
+
+	/**
+	 * Get a new instance of the stat query.
+	 *
+	 * @return \Injic\LaravelStatcounter
+	 */
+	public function newQuery()
+	{
+	  return new Stat();
+	}
+	
+	/**
+	 * Create a raw query to the API.
+	 *
+	 * @param  mixed  $value
+	 * @return \Injic\LaravelStatcounter|static
+	 */
+	public function raw($value)
+	{
+	  if (is_null($this->params)) $this->params = self::$API_DEFAULT_PARAMS;
+	  
+	  if ( is_string($value) )
+	  {
+	    $params = [];
+	    
+	    $url = parse_url($value);
+	    if (array_key_exists('query',$url))
+	    {
+	      parse_str($url['query'], $params);
+	    }
+	    else
+	    {
+	      parse_str($test, $params);
+	    }
+	    
+	    // If fully qualify URL with SHA-1 is passed, use it
+	    if (array_key_exists('scheme',$url)
+  	    && array_key_exists('host',$url)
+  	    && array_key_exists('query',$url)
+  	    && array_key_exists('sha1',$params))
+	    {
+	      $this->url = $value;
+	      return $this;
+	    }
+	    
+	    // Otherwise, remove SHA-1 and use params
+	    if (array_key_exists('sha1',$params)) unset($params['sha1']);
+	    
+	    $this->params = array_merge($this->params, $params);
+	    
+      if (array_key_exists('path',$url))
+      {
+        $this->func = ( $url['path'][0]=='/' ? substr($url['path'],1) : $url['path'] );
+      }
+      else
+      {
+        $this->func = 'stats/';
+      }
+	  }
+	  else if ( is_array($value) )
+	  {
+	    $this->params = array_merge($this->params, $value);
+	  }
+	  else
+	  {
+		  throw new StatException('Invalid raw value submitted');
+	  }
+	   
+	  return $this;
+	}
+
+	/**
+	 * Trims result array by specified columns.
+	 * 
+	 * @param mixed $array
+	 * @return array
+	 */
+	protected function trimColumns($array)
+	{
+	  if (array_search('*',$this->columns)!==false) return $array;
+	  
+	  foreach($array as &$subarray)
+	  {
+	    foreach($subarray as $key => $value)
+	    {
+	      if (array_search($key,$this->columns)===false)
+	      {
+	        unset($subarray->{$key});
+	      }
+	    }
+	  }
+	  
+	  return $array;
+	}
+	
+	/**
+	 * Reads query results for columns.
+	 * 
+	 * @return array
+	 */
+	public function columns()
+	{
+	  $columns = [];
+	  
+	  $array = $this->get();
+	   
+	  foreach($array as $element)
+	  {
+	    foreach($element as $key => $value)
+	    {
+	      if (array_search($key,$columns)===false) $columns[] = $key;
+	    }
+	  }
+	   
+	  return $columns;
+	}
+	
+	/**
+	 * Reads array for column values.
+	 * 
+	 * @param array $array
+	 * @return array
+	 */
+	public static function getColumns($array)
+	{
+	  $columns = [];
+	  
+	  foreach($array as $element)
+	  {
+	    foreach($element as $key => $value)
+	    {
+	      if (array_search($key,$columns)===false) $columns[] = $key;
+	    }
+	  }
+	  
+	  return $columns;
 	}
 	
 }

@@ -2,4 +2,4 @@
 
 namespace Injic\LaravelStatcounter;
 
-class FideloperException extends \Exception {}
+class StatException extends \Exception {}
