@@ -262,6 +262,18 @@ alt="hits counter"></a></div></noscript>';
   }
   
   /**
+   * Start a 'summary' query.
+   *
+   * @return \Injic\LaravelStatcounter\Stat|static
+   */
+  public function summary()
+  {
+    $this->initStats('summary');
+    
+    return $this;
+  }
+  
+  /**
    * Start a 'recent visitor' query.
    *
    * @return \Injic\LaravelStatcounter\Stat|static
