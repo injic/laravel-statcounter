@@ -70,7 +70,7 @@ $project Stat::addProject('project-name','www.example.com','America/Chicago');
 <html>
 <body>
 <!-- Prints the StatCounter tracker using Laravel Templates -->
-{{ Stat::tracker() }}
+{!! Stat::tracker() !!}
 </body>
 </html>
 ```

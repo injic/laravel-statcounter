@@ -182,10 +182,19 @@ class LaravelStatcounter
      */
     public function tracker($isHttps = false, $isVisible = false, $websiteTitle = null)
     {
+        if (is_null($websiteTitle)) {
+            $websiteTitle = $this->fromConfig('default');
+        }
+
         $pid = $this->projectFromConfig($websiteTitle);
         $security = $this->fromConfig('security-codes.'.$websiteTitle);
 
-        return view('statcounter', compact($pid, $security, $isHttps, $isVisible));
+        return view('statcounter::tracker', [
+            'pid' => $pid,
+            'security' => $security,
+            'isHttps' => $isHttps,
+            'isVisible' => $isVisible
+        ]);
     }
 
     /**
