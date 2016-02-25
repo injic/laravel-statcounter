@@ -2,7 +2,7 @@ StatCounter API with support for Laravel
 ---
 [![Latest Stable Version](https://poser.pugx.org/injic/laravel-statcounter/v/stable.svg)](https://packagist.org/packages/injic/laravel-statcounter) [![License](https://poser.pugx.org/injic/laravel-statcounter/license.svg)](https://packagist.org/packages/injic/laravel-statcounter)
 
-The package supports use with the [Laravel framework][2] (v4) providing a `Stat` facade for the [StatCounter API][1].
+The package supports use with the [Laravel framework][2] (v4) providing a `Stat` facade for the [StatCounter API][1]. You can find the documentation for this package [here][6].
 
 ----
 ###Setup:
@@ -52,7 +52,12 @@ Find the package's config found in `app/config/packages/injic/laravel-statcounte
 ----
 ###Usage:
 
-Methods of the `Stat` class simplify what is needed for a StatCounter API query as described in the [API Documentation][4]. Additionally, the `Stat` class was modeled off of the [Laravel DB Query][5] design, and you may expect similar methods. The following are some examples of queries made with the `Stat` facade:
+Methods of the `Stat` class simplify what is needed for a StatCounter API query as described in the [StatCounter API Documentation][4]. Additionally, the `Stat` class was modeled off of the [Laravel DB Query][5] design, and you may expect similar methods. 
+
+You can find the documentation for this package [here][6].
+
+----
+###Examples:
 
 ```php
 <?php
@@ -81,3 +86,4 @@ $project Stat::addProject('project-name','www.example.com','America/Chicago');
 [3]: http://api.statcounter.com/password
 [4]: http://api.statcounter.com/docs/v3
 [5]: http://laravel.com/docs/queries
+[6]: https://github.com/injic/laravel-statcounter/wiki/API-Documentation
