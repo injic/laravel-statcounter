@@ -222,7 +222,7 @@ class LaravelStatcounter
      */
     protected function initStats($type)
     {
-        $this->query = 'stats/';
+        $this->query = 'stats';
         $this->params['s'] = $type;
 
         $this->usesUsername();
@@ -576,7 +576,7 @@ class LaravelStatcounter
     {
         if (is_null($publicStats)) $publicStats = PublicStats::NONE();
 
-        $this->query = 'add_project/';
+        $this->query = 'add_project';
 
         $this->params['wt'] = $websiteTitle;
         $this->params['wu'] = $websiteUrl;
@@ -598,7 +598,7 @@ class LaravelStatcounter
      */
     public function updateProject(PublicStats $publicStats, $websiteTitle = null)
     {
-        $this->query = 'update_project/';
+        $this->query = 'update_project';
 
         $this->params['ps'] = $publicStats->getValue();
         $this->params['pi'] = $this->projectFromConfig($websiteTitle);
@@ -619,7 +619,7 @@ class LaravelStatcounter
      */
     public function updateLogsize($logSize, $websiteTitle = null)
     {
-        $this->query = 'update_logsize/';
+        $this->query = 'update_logsize';
 
         $this->params['ls'] = $logSize;
         $this->params['pi'] = $this->projectFromConfig($websiteTitle);
@@ -638,7 +638,7 @@ class LaravelStatcounter
      */
     public function accountLogsizes()
     {
-        $this->query = 'account_logsizes/';
+        $this->query = 'account_logsizes';
 
         $this->usesUsername();
         $this->usesTime();
@@ -655,7 +655,7 @@ class LaravelStatcounter
      */
     public function userDetails($username = null, $password = null)
     {
-        $this->query = 'user_details/';
+        $this->query = 'user_details';
 
         if (!is_null($password)) {
             $this->config['api-password'] = $password;
@@ -676,7 +676,7 @@ class LaravelStatcounter
      */
     public function userProjects($username = null, $password = null)
     {
-        $this->query = 'user_projects/';
+        $this->query = 'user_projects';
 
         if (!is_null($password)) {
             $this->config['api-password'] = $password;
@@ -696,7 +696,7 @@ class LaravelStatcounter
      */
     public function projectDetails($websiteTitle = null)
     {
-        $this->query = 'select_project/';
+        $this->query = 'select_project';
 
         $this->params['pi'] = $this->projectFromConfig($websiteTitle);
 
@@ -716,7 +716,7 @@ class LaravelStatcounter
      */
     public function createIpLabel($ip, $label, $websiteTitle = null)
     {
-        $this->query = 'create_ip_label/';
+        $this->query = 'create_ip_label';
 
         $this->params['ip'] = $ip;
         $this->params['ipl'] = $label;
@@ -737,7 +737,7 @@ class LaravelStatcounter
      */
     public function deleteIpLabel($label, $websiteTitle = null)
     {
-        $this->query = 'delete_ip_label/';
+        $this->query = 'delete_ip_label';
 
         $this->params['ipl'] = $label;
         $this->params['pi'] = $this->projectFromConfig($websiteTitle);
@@ -784,7 +784,7 @@ class LaravelStatcounter
             }
         }
 
-        switch ($granularity) {
+        switch ($granularity->getValue()) {
             case Granularity::HOURLY:
                 $this->params['g'] = 'hourly';
                 $this->params['sh'] = $start->hour;
@@ -1108,7 +1108,7 @@ class LaravelStatcounter
     {
         $ch = curl_init();
 
-        $optArray = array(
+        $optArray = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,  // return content
             CURLOPT_HEADER => false, // don't return headers
@@ -1117,8 +1117,8 @@ class LaravelStatcounter
             CURLOPT_AUTOREFERER => true,  // set referer on redirect
             CURLOPT_MAXREDIRS => 10,    // stop after 10 redirects
             CURLOPT_FAILONERROR => true   // fail if HTTP returns error
-        );
-        $optArray = array_merge($optArray, $this->curlopts);
+        ];
+        $optArray = array_replace($optArray, $this->curlopts);
         curl_setopt_array($ch, $optArray);
 
         // send query and store response
